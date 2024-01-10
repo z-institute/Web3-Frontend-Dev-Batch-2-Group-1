@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
 
 // API functions to fetch various data
-import {
-  getAddressData,
-  getBalanceHistory,
-  getBitcoinFiatRates,
-} from "./api/fetchData";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { getBitcoinFiatRates } from "./api/fetchData";
 
 import AddressInput from "@/components/AddressInput";
-import WalletStats from "@/components/WalletStats";
 import BalanceChart from "@/components/BalanceChart";
 import PortfolioPieChart from "@/components/PortfolioPieChart";
+import { WalletType } from "@/enums/WalletType";
+
+interface Wallet {
+  address: string;
+  type: WalletType;
+}
 
 export interface WalletData {
   balance: number;
@@ -61,12 +59,8 @@ const mockBalanceHistoryData = [
 
 export default function Home() {
   // State hooks for various pieces of data and UI control
+  const [wallets, setWallets] = useState<Wallet[]>([]);
   const [addressData, setAddressData] = useState<WalletData>();
-  const [balanceHistory, setBalanceHistory] = useState<unknown>();
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  // Default interval for balance history in seconds
-  const [interval, setInterval] = useState("3600"); // Default to 3600 seconds (1 hour)
   // Default fiat rates set to 0, will be updated via API call
   const [fiatRate, setFiatRate] = useState({ USD: 0, EUR: 0, GBP: 0 });
 
@@ -76,28 +70,17 @@ export default function Home() {
   }, []);
 
   // Function to handle address form submission
-  const handleAddressSubmit = async (address: string) => {
-    const data = await getAddressData(address);
-    setAddressData(data);
-  };
+  const handleAddressSubmit = async (
+    address: string,
+    walletType: WalletType
+  ) => {
+    // add tag
+    const newWalletsList = [...wallets];
+    newWalletsList.push({ address, type: walletType });
+    setWallets(newWalletsList);
 
-  // Function to fetch balance history based on selected dates and interval
-  const fetchBalanceHistory = async () => {
-    if (!addressData) {
-      return;
-    }
-
-    // Convert dates to timestamps
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-    const endTimestamp = Math.floor(endDate.getTime() / 1000);
-
-    const history = await getBalanceHistory(
-      addressData.address,
-      startTimestamp,
-      endTimestamp,
-      interval
-    );
-    setBalanceHistory(history);
+    // const data = await getAddressData(address);
+    // setAddressData(data);
   };
 
   // Function to fetch current Bitcoin fiat rates
@@ -111,72 +94,16 @@ export default function Home() {
 
   return (
     <div className="App bg-background min-h-screen flex flex-col items-center">
-      <header className="bg-white shadow w-full">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Bitcoin Explorer</h1>
-        </div>
+      <header className="navbar bg-base-100">
+        <a className="btn btn-ghost text-xl">God Tier Wallet Analytics</a>
       </header>
       <main className="container">
-        <AddressInput onAddressSubmit={handleAddressSubmit} />
-        {addressData && (
-          <div>
-            <WalletStats walletData={addressData} fiatRate={fiatRate} />
-            <div className="container mx-auto p-6">
-              <h2 className="text-2xl font-bold text-center my-6">
-                Bitcoin Balance Chart
-              </h2>
-
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-6 shadow-lg p-6 rounded-lg bg-white">
-                <div className="flex flex-col mb-3">
-                  <label htmlFor="start-date" className="font-semibold mb-2">
-                    Starting Date
-                  </label>
-                  <DatePicker
-                    id="start-date"
-                    selected={startDate}
-                    onChange={(date) => date && setStartDate(date)}
-                    className="w-full max-w-xs h-12 rounded-lg text-lg shadow-inner"
-                  />
-                </div>
-                <div className="flex flex-col mb-3">
-                  <label htmlFor="end-date" className="font-semibold mb-2">
-                    Ending Date
-                  </label>
-                  <DatePicker
-                    id="end-date"
-                    selected={endDate}
-                    onChange={(date) => date && setEndDate(date)}
-                    className="w-full max-w-xs h-12 rounded-lg text-lg shadow-inner border"
-                  />
-                </div>
-                <div className="flex flex-col mb-3">
-                  <label htmlFor="time-interval" className="font-semibold mb-2">
-                    Time Interval
-                  </label>
-                  <select
-                    id="time-interval"
-                    value={interval}
-                    onChange={(e) => setInterval(e.target.value)}
-                    className="w-full max-w-xs h-12 rounded-lg text-lg shadow-inner border"
-                  >
-                    <option value="3600">1 Hour</option>
-                    <option value="14400">4 Hours</option>
-                    <option value="86400">Daily</option>
-                    <option value="604800">Weekly</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex justify-center">
-                <button
-                  onClick={fetchBalanceHistory}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-400 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                >
-                  Load History
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <AddressInput onAddWalletAddress={handleAddressSubmit} />
+        {wallets.map(({ type, address }) => (
+          <span key={`${type}:${address}`} className="badge">
+            {type}: {address}
+          </span>
+        ))}
 
         {/* Display address data and Chart in a styled manner */}
         {/* ... */}
