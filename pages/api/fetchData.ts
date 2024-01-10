@@ -26,19 +26,6 @@ export const getAddressData = async (address: string) => {
   }
 };
 
-// TODO: change to other API
-// Function to get Bitcoin fiat rates for a specific timestamp
-export const getBitcoinFiatRates = async (timestampUnix: number) => {
-  try {
-    const response = await axios.get("/api/btcusd");
-    return response.data[1].quote.USD;
-  } catch (error) {
-    console.error(error);
-  }
-
-  return { usd: 40000, eur: 40000, gbp: 400000 };
-};
-
 // Function to get the balance history for a Bitcoin address
 export const getBalanceHistory = async (
   address: string,

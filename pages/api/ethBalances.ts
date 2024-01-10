@@ -1,4 +1,3 @@
-import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { Network, Alchemy, Utils } from "alchemy-sdk";
@@ -17,10 +16,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const address = req.query.address as string;
+
   try {
-    const balances = await alchemy.core.getTokenBalances(
-      DEFAULT_WALLET_ADDRESS
-    );
+    const balances = await alchemy.core.getTokenBalances(address);
 
     // Remove tokens with zero balance
     const nonZeroBalances = balances.tokenBalances.filter((token) => {
@@ -51,10 +50,7 @@ export default async function handler(
       })
     );
 
-    let balance = await alchemy.core.getBalance(
-      DEFAULT_WALLET_ADDRESS,
-      "latest"
-    );
+    let balance = await alchemy.core.getBalance(address, "latest");
     response.unshift({
       name: "Ethereum",
       symbol: "ETH",
