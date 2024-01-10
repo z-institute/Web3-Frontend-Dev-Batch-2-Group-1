@@ -30,7 +30,6 @@ export const getAddressData = async (address: string) => {
 // Function to get Bitcoin fiat rates for a specific timestamp
 export const getBitcoinFiatRates = async (timestampUnix: number) => {
   try {
-    debugger;
     const response = await axios.get("/api/btcusd");
     return response.data[1].quote.USD;
   } catch (error) {

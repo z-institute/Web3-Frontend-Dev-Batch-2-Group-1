@@ -3,8 +3,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = {
   usd: number;
-  eur: number;
-  gbp: number;
 };
 
 export default async function handler(
@@ -12,9 +10,8 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    debugger;
     const response = await axios.get(
-      `${process.env.COIN_MARKET_CAP_URL}/v2/cryptocurrency/quotes/latest`,
+      `${process.env.COIN_MARKET_CAP_HOST}/v2/cryptocurrency/quotes/latest`,
       {
         params: {
           id: 1,
@@ -22,7 +19,7 @@ export default async function handler(
           // convert: "USD",
         },
         headers: {
-          "X-CMC_PRO_API_KEY": process.env.COIN_MARKET_CAP_API,
+          "X-CMC_PRO_API_KEY": process.env.COIN_MARKET_CAP_API_KEY,
         },
       }
     );
@@ -32,5 +29,5 @@ export default async function handler(
   } catch (error) {
     console.error(error);
   }
-  res.status(200).json({ usd: 40000, eur: 40000, gbp: 400000 });
+  res.status(500);
 }

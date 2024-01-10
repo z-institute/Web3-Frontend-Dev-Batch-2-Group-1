@@ -13,6 +13,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import AddressInput from "@/components/AddressInput";
 import WalletStats from "@/components/WalletStats";
 import BalanceChart from "@/components/BalanceChart";
+import PortfolioPieChart from "@/components/PortfolioPieChart";
 
 export interface WalletData {
   balance: number;
@@ -20,10 +21,48 @@ export interface WalletData {
   totalReceived: number;
 }
 
+const mockPortfolio = [
+  { name: "BTC", value: 400 },
+  { name: "ETH", value: 300 },
+  { name: "SOL", value: 300 },
+  { name: "TON", value: 200 },
+];
+
+const mockBalanceHistoryData = [
+  {
+    name: "1 Jan",
+    eth: 4000,
+  },
+  {
+    name: "1 Feb",
+    eth: 3000,
+  },
+  {
+    name: "1 Mar",
+    eth: 2000,
+  },
+  {
+    name: "1 Apr",
+    eth: 2780,
+  },
+  {
+    name: "1 May",
+    eth: 1890,
+  },
+  {
+    name: "1 Jun",
+    eth: 2390,
+  },
+  {
+    name: "1 Jul",
+    eth: 3490,
+  },
+];
+
 export default function Home() {
   // State hooks for various pieces of data and UI control
   const [addressData, setAddressData] = useState<WalletData>();
-  const [balanceHistory, setBalanceHistory] = useState(null);
+  const [balanceHistory, setBalanceHistory] = useState<unknown>();
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   // Default interval for balance history in seconds
@@ -77,7 +116,7 @@ export default function Home() {
           <h1 className="text-3xl font-bold text-gray-900">Bitcoin Explorer</h1>
         </div>
       </header>
-      <main className="flex-grow">
+      <main className="container">
         <AddressInput onAddressSubmit={handleAddressSubmit} />
         {addressData && (
           <div>
@@ -141,7 +180,13 @@ export default function Home() {
 
         {/* Display address data and Chart in a styled manner */}
         {/* ... */}
-        {balanceHistory && <BalanceChart historyData={balanceHistory} />}
+        {/* {balanceHistory && <BalanceChart historyData={balanceHistory} />} */}
+        <div className="h-80">
+          <BalanceChart data={mockBalanceHistoryData} />
+        </div>
+        <div className="h-80">
+          <PortfolioPieChart data={mockPortfolio} />
+        </div>
       </main>
     </div>
   );
