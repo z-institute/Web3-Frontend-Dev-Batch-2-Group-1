@@ -5,7 +5,7 @@ import AddressInput from "@/components/AddressInput";
 import BalanceChart from "@/components/BalanceChart";
 import PortfolioPieChart from "@/components/PortfolioPieChart";
 import { WalletType } from "@/enums/WalletType";
-import { FiatRate } from "@/types";
+import { FiatRate, Token } from "@/types";
 
 interface Wallet {
   address: string;
@@ -26,31 +26,76 @@ export interface WalletData {
 const mockBalanceHistoryData = [
   {
     name: "1 Jan",
+    btc: 1000,
     eth: 4000,
   },
   {
     name: "1 Feb",
+    btc: 1000,
     eth: 3000,
+    sol: 2000,
   },
   {
     name: "1 Mar",
+    btc: 1000,
     eth: 2000,
+    sol: 2000,
   },
   {
     name: "1 Apr",
+    btc: 1000,
     eth: 2780,
+    sol: 2000,
+    ton: 1000,
   },
   {
     name: "1 May",
+    btc: 1000,
     eth: 1890,
+    ton: 1000,
   },
   {
     name: "1 Jun",
+    btc: 1000,
     eth: 2390,
+    ton: 1000,
   },
   {
     name: "1 Jul",
+    btc: 1000,
     eth: 3490,
+    ton: 1000,
+  },
+  {
+    name: "1 Aug",
+    btc: 1000,
+    eth: 2780,
+    sol: 2000,
+    ton: 1000,
+  },
+  {
+    name: "1 Sep",
+    btc: 1000,
+    eth: 1890,
+    ton: 1000,
+  },
+  {
+    name: "1 Oct",
+    btc: 1000,
+    eth: 2390,
+    ton: 1000,
+  },
+  {
+    name: "1 Nov",
+    btc: 1000,
+    eth: 3490,
+    ton: 1000,
+  },
+  {
+    name: "1 Dec",
+    btc: 1000,
+    eth: 3490,
+    ton: 1000,
   },
 ];
 
@@ -142,7 +187,7 @@ export default function Home() {
       return;
     } else if (walletType === WalletType.Evm) {
       const tokens = await getEthereumBalance(address);
-      const eth = tokens.find((t) => t.symbol === "ETH");
+      const eth = tokens.find((t: Token) => t.symbol === "ETH");
 
       const newPortfolioData = [...portfolioData];
       const rate = fiatRates.find((r) => r.symbol === "ETH");
@@ -178,14 +223,12 @@ export default function Home() {
           </span>
         ))}
 
-        {/* Display address data and Chart in a styled manner */}
-        {/* ... */}
-        {/* {balanceHistory && <BalanceChart historyData={balanceHistory} />} */}
-        <div className="h-80">
-          <BalanceChart data={mockBalanceHistoryData} />
-        </div>
         <div className="h-80">
           <PortfolioPieChart data={portfolioData} />
+        </div>
+
+        <div className="h-80">
+          <BalanceChart data={mockBalanceHistoryData} />
         </div>
       </main>
     </div>
