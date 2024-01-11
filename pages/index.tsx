@@ -7,6 +7,8 @@ import PortfolioPieChart from "@/components/PortfolioPieChart";
 import { WalletType } from "@/enums/WalletType";
 import { FiatRate, Token } from "@/types";
 import tonClient from "../config/tonClient";
+import solanaConnection from "@/config/solanaClient";
+import * as solanaWeb3 from '@solana/web3.js';
 
 interface Wallet {
   address: string;
@@ -147,6 +149,19 @@ const getTonBalance = async (address: string) => {
 
   return;
 };
+const getSolanaBalance = async (address: string) => {
+  console.log(process.env.NEXT_PUBLIC_ALCHEMY_SOLANA_API_KEY);
+  try {
+    const pubKey = new solanaWeb3.PublicKey(address);
+    const balance = await solanaConnection.getBalance(pubKey);
+    return balance;
+  } catch (error) {
+    console.error(error);
+    
+  }
+  return;
+}
+
 
 export default function Home() {
   // State hooks for various pieces of data and UI control
@@ -227,6 +242,18 @@ export default function Home() {
       setPortfolioData((prev) => [
         ...prev,
         { name: "TON", value: tokenBalance * rate.price },
+      ]);
+    } else if (walletType === WalletType.Solana){
+      const tokenBalance = await getSolanaBalance(address);
+      const rate = fiatRates.find((r) => r.symbol === "SOL");
+
+      if (!rate) {
+        return;
+      }
+
+      setPortfolioData((prev) => [
+        ...prev,
+        { name: "SOL", value: tokenBalance * rate.price },
       ]);
     }
   };
