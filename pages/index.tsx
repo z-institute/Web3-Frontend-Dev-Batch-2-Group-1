@@ -6,6 +6,7 @@ import BalanceChart from "@/components/BalanceChart";
 import PortfolioPieChart from "@/components/PortfolioPieChart";
 import { WalletType } from "@/enums/WalletType";
 import { FiatRate, Token } from "@/types";
+import tonClient from "../config/tonClient";
 
 interface Wallet {
   address: string;
@@ -133,6 +134,20 @@ const getEthereumBalance = async (address: string) => {
   return;
 };
 
+const getTonBalance = async (address: string) => {
+  // Address: "EQCE0HgxgTE-GGP750FiitKIzuQKdbG9zOxVgy0kUNqgVQNI"
+  try {
+    const _bigNum = await tonClient.getBalance(address);
+    const _balance = Number(_bigNum);
+
+    return _balance / 1000000000;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return;
+};
+
 export default function Home() {
   // State hooks for various pieces of data and UI control
 
@@ -201,6 +216,18 @@ export default function Home() {
       });
       setPortfolioData(newPortfolioData);
       return;
+    } else if (walletType === WalletType.Ton) {
+      const tokenBalance = await getTonBalance(address);
+      const rate = fiatRates.find((r) => r.symbol === "TON");
+
+      if (!rate) {
+        return;
+      }
+
+      setPortfolioData((prev) => [
+        ...prev,
+        { name: "TON", value: tokenBalance * rate.price },
+      ]);
     }
   };
 
