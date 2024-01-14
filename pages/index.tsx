@@ -8,7 +8,9 @@ import { WalletType } from "@/enums/WalletType";
 import { FiatRate, Token } from "@/types";
 import tonClient from "../config/tonClient";
 import solanaConnection from "@/config/solanaClient";
-import * as solanaWeb3 from '@solana/web3.js';
+import * as solanaWeb3 from "@solana/web3.js";
+import { useAccount } from "wagmi";
+import { ConnectKitButton } from "connectkit";
 
 interface Wallet {
   address: string;
@@ -157,14 +159,14 @@ const getSolanaBalance = async (address: string) => {
     return balance;
   } catch (error) {
     console.error(error);
-    
   }
   return;
-}
-
+};
 
 export default function Home() {
   // State hooks for various pieces of data and UI control
+
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   // Default fiat rates, will be updated via API call
   const [fiatRates, setFiatRates] = useState<FiatRate[]>([
@@ -243,7 +245,7 @@ export default function Home() {
         ...prev,
         { name: "TON", value: tokenBalance * rate.price },
       ]);
-    } else if (walletType === WalletType.Solana){
+    } else if (walletType === WalletType.Solana) {
       const tokenBalance = await getSolanaBalance(address);
       const rate = fiatRates.find((r) => r.symbol === "SOL");
 
@@ -267,7 +269,12 @@ export default function Home() {
   return (
     <div className="App bg-background min-h-screen flex flex-col items-center">
       <header className="navbar bg-base-100">
-        <a className="btn btn-ghost text-xl">God Tier Wallet Analytics</a>
+        <div className="flex-1">
+          <a className="btn btn-ghost text-xl">God Tier Wallet Analytics</a>
+        </div>
+        <div className="flex-none">
+          <ConnectKitButton />
+        </div>
       </header>
       <main className="container">
         <AddressInput onAddWalletAddress={handleAddressSubmit} />

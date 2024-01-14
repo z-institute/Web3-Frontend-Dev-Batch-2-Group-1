@@ -15,6 +15,7 @@ const AddressInput = ({
   // Function to handle form submission
   const handleSubmit = (walletType: WalletType) => {
     onAddressSubmit(address, walletType);
+    setAddress("");
   };
 
   return (
