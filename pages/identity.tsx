@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { ConnectKitButton, useChains } from "connectkit";
 import { useSwitchNetwork, useContractRead } from "wagmi";
 
 import CrearteSoul from "@/components/CrearteSoul";
-import useContract from "@/hooks/useContract";
+const StageNames = dynamic(() => import("../components/StageNames"), {
+  ssr: false,
+});
+
 export default function Identity() {
   const chains = useChains();
   const [name, setName] = useState("");
-  const { SoulFactory } = useContract();
-  const { data, isLoading, refetch } = useContractRead({
-    ...SoulFactory,
-    functionName: "getSoulByStageName",
-  });
-
-  console.log(data);
-
   const { switchNetwork } = useSwitchNetwork();
 
   return (
@@ -34,16 +30,16 @@ export default function Identity() {
           <ConnectKitButton />
         </div>
       </header>
-      <div className="flex justify-end px-3 py-5">
-        <button onClick={() => refetch()}>refetch</button>
-      </div>
-      <div className="flex justify-end px-3 py-5">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <CrearteSoul name={name} />
+      <StageNames />
+      <div>
+        <div className="flex justify-end px-3 py-5">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <CrearteSoul name={name} />
+        </div>
       </div>
     </div>
   );
