@@ -3,12 +3,9 @@ import type { AppProps } from "next/app";
 import "buffer";
 
 import { WagmiConfig, createConfig, mainnet } from "wagmi";
-import {
-  ConnectKitProvider,
-  ConnectKitButton,
-  getDefaultConfig,
-} from "connectkit";
-import { arbitrum, optimism, polygon } from "wagmi/chains";
+import { ConnectKitProvider, getDefaultConfig, SIWESession } from "connectkit";
+import { arbitrum, optimism, polygon, localhost } from "wagmi/chains";
+import { siweClient } from "@/utils/siweClient";
 
 const config = createConfig(
   getDefaultConfig({
@@ -24,17 +21,28 @@ const config = createConfig(
     appUrl: "https://family.co", // your app's url
     appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
 
-    chains: [mainnet, polygon, optimism, arbitrum],
+    chains: [mainnet, polygon, optimism, arbitrum, localhost],
   })
 );
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig config={config}>
-      <ConnectKitProvider>
-        <Component {...pageProps} />
-        <ConnectKitButton />
-      </ConnectKitProvider>
+      <siweClient.Provider
+        // Optional parameters
+        enabled={true} // defaults true
+        nonceRefetchInterval={300000} // in milliseconds, defaults to 5 minutes
+        sessionRefetchInterval={300000} // in milliseconds, defaults to 5 minutes
+        signOutOnDisconnect={true} // defaults true
+        signOutOnAccountChange={true} // defaults true
+        signOutOnNetworkChange={true} // defaults true
+        // onSignIn={(session?: SIWESession) => void}
+        // onSignOut={() => void}
+      >
+        <ConnectKitProvider>
+          <Component {...pageProps} />
+        </ConnectKitProvider>
+      </siweClient.Provider>
     </WagmiConfig>
   );
 }
